@@ -10,9 +10,13 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const location = useLocation()
   const [searchParams] = useSearchParams()
 
-  // Show nothing while checking authentication
+  // Show loading state while checking authentication
   if (loading) {
-    return null
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    )
   }
 
   // Redirect to login if not authenticated

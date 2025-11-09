@@ -3,6 +3,18 @@ phrase_generation_task:
     Create a short, natural-sounding phrase using the provided words: {words}
 
     User context: {user_context}
+    
+    Language Information:
+    {native_language}
+    {target_language}
+
+    CRITICAL LANGUAGE INSTRUCTIONS:
+    - The provided words are in English
+    - If target_language information is provided above (not empty), you MUST generate the ENTIRE phrase in that target language
+    - Translate the English words appropriately into the target language (consider proper conjugation, grammar, and natural usage)
+    - If NO target_language is provided above (empty or missing), generate the phrase in English
+    - The phrase MUST sound natural and authentic in the target language, not like a literal translation
+    - Pay close attention to the target_language field above - if it contains a language name and code, you MUST use that language
 
     Your task is to compose a concise phrase that incorporates as many of these words
     as possible while maintaining natural flow and meaning. Consider the user context
@@ -12,14 +24,14 @@ phrase_generation_task:
 
     You must return your response as a JSON object with the following structure:
     {{
-      "phrase": "your generated phrase here",
+      "phrase": "your generated phrase here (in target language if specified)",
       "words": ["word1", "word2", "word3"]
     }}
 
-    Where "phrase" is the generated phrase, and "words" is a list of the words from the
-    input that you actually used in the phrase.
+    Where "phrase" is the generated phrase in the target language (or English if no target language),
+    and "words" is a list of the original English words from the input that you actually used in the phrase.
   expected_output: >
     A JSON object with two fields: "phrase" (string) containing a short phrase (5-15 words)
-    that naturally incorporates words from the input, and "words" (array of strings)
-    containing the list of words that were actually used in the phrase.
+    in the target language (or English if not specified) that naturally incorporates words from the input,
+    and "words" (array of strings) containing the list of the original English words that were actually used.
   agent: phrase_creator

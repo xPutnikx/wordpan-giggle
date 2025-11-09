@@ -91,21 +91,87 @@ async def get_user_context(user_id: str) -> Optional[str]:
         return None
 
 
+async def get_user_profile(user_id: str, auth_token: str) -> Optional[dict]:
+    """
+    Fetch user profile including language preferences from Supabase.
+
+    Args:
+        user_id: The user's UUID
+        auth_token: The user's JWT token for authentication
+
+    Returns:
+        Dictionary with profile data including context, native_language, and target_language,
+        or None if not found
+    """
+    try:
+        # Create a new Supabase client instance for this authenticated query
+        # Set the auth token in headers for RLS policies to work correctly
+        authenticated_client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+        
+        # Set the authorization header on the postgrest client
+        authenticated_client.postgrest.headers["Authorization"] = f"Bearer {auth_token}"
+        authenticated_client.postgrest.headers["apikey"] = SUPABASE_ANON_KEY
+        
+        # Fetch user profile from the profiles table
+        response = authenticated_client.table("profiles").select("context, native_language, target_language").eq("id", user_id).single().execute()
+        
+        if response.data:
+            return response.data
+        return None
+    except Exception as e:
+        print(f"Error fetching user profile: {e}")
+        return None
+
+
 @traceable
-async def generate_random_phrase(words: list[str], user_context: str) -> PhraseOutput:
+async def generate_random_phrase(words: list[str], user_context: str, native_language: Optional[str] = None, target_language: Optional[str] = None) -> PhraseOutput:
     """
     Generate a random phrase using the RandomPhraseCrew.
 
     Args:
         words: List of words to use in the phrase
         user_context: User context to personalize the phrase
+        native_language: User's native language code (optional)
+        target_language: User's target language code (optional)
 
     Returns:
         PhraseOutput with phrase and words used
     """
+    # Language code to name mapping
+    LANGUAGE_NAMES = {
+        'en': 'English',
+        'es': 'Spanish',
+        'fr': 'French',
+        'de': 'German',
+        'pt': 'Portuguese',
+        'ru': 'Russian',
+        'zh': 'Chinese (Simplified)',
+        'ja': 'Japanese',
+        'it': 'Italian',
+        'ko': 'Korean',
+    }
+    
+    # Format inputs for the crew
+    words_str = ', '.join(words) if isinstance(words, list) else str(words)
+    
+    # Format language information for the YAML template
+    if native_language:
+        native_lang_name = LANGUAGE_NAMES.get(native_language, native_language)
+        native_lang_str = f'Native language: {native_lang_name} ({native_language})'
+    else:
+        native_lang_str = '(No native language specified)'
+    
+    if target_language:
+        target_lang_name = LANGUAGE_NAMES.get(target_language, target_language)
+        target_lang_str = f'Target language: {target_lang_name} ({target_language}) - Generate the phrase in this language!'
+    else:
+        target_lang_str = '(No target language specified - generate in English)'
+    
     inputs = {
-        'words': jsonify(words).get_data(as_text=True),
-        'user_context': jsonify(user_context).get_data(as_text=True)
+        'words': words_str,
+        'user_context': user_context or '',
+        'native_language': native_lang_str,
+        'target_language': target_lang_str
     }
 
     result = await RandomPhraseCrew().crew().kickoff_async(inputs=inputs)
@@ -156,12 +222,20 @@ async def get_random_phrase():
         if not isinstance(words, list) or len(words) == 0:
             return jsonify({"error": "'words' must be a non-empty array"}), 400
 
-        # Get user context from Supabase
+        # Get user profile from Supabase (including context and language preferences)
         user_id = request.user.id
-        user_context = await get_user_context(user_id)
+        # Extract token for authenticated queries
+        auth_header = request.headers.get("Authorization")
+        token = auth_header.split(" ")[1] if auth_header and " " in auth_header else auth_header
+        user_profile = await get_user_profile(user_id, token)
+        
+        # Extract context and language preferences
+        user_context = user_profile.get("context", "") if user_profile else ""
+        native_language = user_profile.get("native_language") if user_profile else None
+        target_language = user_profile.get("target_language") if user_profile else None
 
-        # Generate the phrase
-        result = await generate_random_phrase(words, user_context or "")
+        # Generate the phrase (language preferences can be used by the crew)
+        result = await generate_random_phrase(words, user_context or "", native_language, target_language)
 
         return jsonify(result.model_dump()), 200
 

@@ -95,9 +95,9 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/profile')}>
                 <IconUserCircle />
-                Account
+                Profile
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconCreditCard />

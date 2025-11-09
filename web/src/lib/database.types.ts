@@ -13,20 +13,55 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          id: string
+          context: string | null
+          native_language: string | null
+          target_language: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          context?: string | null
+          native_language?: string | null
+          target_language?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          context?: string | null
+          native_language?: string | null
+          target_language?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       words: {
         Row: {
           id: string
           word: string
+          base_word: string | null
+          language: string | null
+          translation_of: string | null
           created_at: string
         }
         Insert: {
           id?: string
           word: string
+          base_word?: string | null
+          language?: string | null
+          translation_of?: string | null
           created_at?: string
         }
         Update: {
           id?: string
           word?: string
+          base_word?: string | null
+          language?: string | null
+          translation_of?: string | null
           created_at?: string
         }
       }

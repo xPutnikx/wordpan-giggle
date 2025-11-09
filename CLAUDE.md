@@ -130,6 +130,10 @@ supabase migration new <descriptive_name>
 # Access database
 supabase db psql
 
+**DO NOT RUN THESE COMMANDS** (they will wipe data):
+- ❌ `supabase db reset`
+- ❌ `supabase db push`
+
 # Open Supabase Studio
 open http://127.0.0.1:54323
 ```

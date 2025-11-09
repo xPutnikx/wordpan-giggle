@@ -1,12 +1,29 @@
 import { useEffect } from 'react'
 import { useRandomPhrase } from '@/hooks/use-random-phrase'
+import { useUser } from '@/contexts/UserContext'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English',
+  es: 'Spanish',
+  fr: 'French',
+  de: 'German',
+  pt: 'Portuguese',
+  ru: 'Russian',
+  zh: 'Chinese (Simplified)',
+  ja: 'Japanese',
+  it: 'Italian',
+  ko: 'Korean',
+}
+
 export default function RandomPhrasePage() {
   const { phrase, words, loading, error, generatePhrase } = useRandomPhrase()
+  const { profile } = useUser()
+  const targetLanguage = profile?.target_language
+  const targetLanguageName = targetLanguage ? LANGUAGE_NAMES[targetLanguage] || targetLanguage : null
 
   // Generate initial phrase on component mount
   useEffect(() => {
@@ -20,7 +37,14 @@ export default function RandomPhrasePage() {
           <CardHeader>
             <CardTitle>Random Phrase Generator</CardTitle>
             <CardDescription>
-              Generate creative phrases using three random words from the database
+              {targetLanguageName 
+                ? `Generate creative phrases in ${targetLanguageName} using three random words from the database`
+                : 'Generate creative phrases using three random words from the database'}
+              {!targetLanguage && (
+                <span className="block mt-1 text-xs text-muted-foreground">
+                  Set your target language in your profile to generate phrases in that language
+                </span>
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -46,7 +70,9 @@ export default function RandomPhrasePage() {
 
             {/* Generated Phrase Section */}
             <div>
-              <h3 className="text-sm font-medium mb-3">Generated Phrase:</h3>
+              <h3 className="text-sm font-medium mb-3">
+                Generated Phrase{targetLanguageName ? ` (in ${targetLanguageName})` : ''}:
+              </h3>
               <div className="rounded-lg border bg-muted/50 p-6 min-h-[120px] flex items-center justify-center">
                 {loading ? (
                   <div className="space-y-2 w-full">
@@ -89,10 +115,13 @@ export default function RandomPhrasePage() {
               <p>
                 This feature pulls three random words from the database and uses AI to create
                 a creative phrase that incorporates all three words.
+                {targetLanguageName && (
+                  <> The phrase will be generated in <strong>{targetLanguageName}</strong>.</>
+                )}
               </p>
               <p>
-                Each generation is personalized based on your user profile context for a unique
-                experience.
+                Each generation is personalized based on your user profile context and language preferences
+                for a unique learning experience.
               </p>
             </div>
           </CardContent>
