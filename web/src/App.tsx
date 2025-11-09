@@ -10,6 +10,7 @@ import SignUpPage from './pages/signup'
 import WordsPage from './pages/words'
 import RandomPhrasePage from './pages/random-phrase'
 import ProfilePage from './pages/profile'
+import WordPairsPage from './pages/word-pairs'
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
               <Route path="/words" element={<WordsPage />} />
               <Route path="/random-phrase" element={<RandomPhrasePage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/word-pairs" element={<WordPairsPage />} />
             </Route>
 
             {/* Default redirect */}

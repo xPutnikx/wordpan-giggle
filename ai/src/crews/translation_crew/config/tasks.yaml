@@ -1,0 +1,43 @@
+translation_suggestions_task:
+  description: >
+    Translate the word "{word}" from {native_language} to {target_language}.
+
+    IMPORTANT INSTRUCTIONS:
+    - Provide exactly 3 translation suggestions
+    - Each suggestion should be a different translation option (consider different contexts, formality levels, or meanings)
+    - Order suggestions by confidence/appropriateness (most common/accurate first)
+    - Consider grammatical forms, conjugations, and natural usage in the target language
+    - Provide context for when each translation is most appropriate
+    - If the word has multiple meanings, include different translations for different contexts
+
+    You must return your response as a JSON object with the following structure:
+    {{
+      "suggestions": [
+        {{
+          "translation": "translation1",
+          "confidence": 0.95,
+          "context": "Most common usage, appropriate for everyday conversation"
+        }},
+        {{
+          "translation": "translation2",
+          "confidence": 0.85,
+          "context": "Alternative form or context-specific usage"
+        }},
+        {{
+          "translation": "translation3",
+          "confidence": 0.75,
+          "context": "Less common but valid translation option"
+        }}
+      ]
+    }}
+
+    Where each suggestion has:
+    - "translation": the translated word in the target language
+    - "confidence": a number between 0.0 and 1.0 indicating accuracy/commonness
+    - "context": a brief explanation of when this translation is most appropriate
+  expected_output: >
+    A JSON object with a "suggestions" array containing exactly 3 translation options.
+    Each suggestion must include translation (string), confidence (float 0.0-1.0), and context (string).
+    Suggestions should be ordered by confidence from highest to lowest.
+  agent: translation_expert
+

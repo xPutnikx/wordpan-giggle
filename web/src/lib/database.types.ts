@@ -39,6 +39,44 @@ export interface Database {
           updated_at?: string
         }
       }
+      user_word_pairs: {
+        Row: {
+          id: string
+          user_id: string
+          source_word: string
+          target_word: string
+          mastered: boolean
+          times_practiced: number
+          times_correct: number
+          times_wrong: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          source_word: string
+          target_word: string
+          mastered?: boolean
+          times_practiced?: number
+          times_correct?: number
+          times_wrong?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          source_word?: string
+          target_word?: string
+          mastered?: boolean
+          times_practiced?: number
+          times_correct?: number
+          times_wrong?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
       words: {
         Row: {
           id: string
